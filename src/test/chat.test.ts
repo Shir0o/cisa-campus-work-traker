@@ -196,6 +196,12 @@ describe('chat.ts services', () => {
         createdById: 'u1',
         createdByName: 'Admin User',
         createdAt: 'SERVER_TS',
+        lastMessage: {
+          text: 'Admin User started announcements for "Weekly Updates"',
+          senderId: 'u1',
+          senderName: 'System',
+          timestamp: 'SERVER_TS',
+        },
       });
 
       expect(mockAddDoc).toHaveBeenNthCalledWith(2, 'col:chatRooms/new-doc-id/messages', {
@@ -245,6 +251,12 @@ describe('chat.ts services', () => {
         createdByName: 'Naomi',
         createdAt: 'SERVER_TS',
         audiencePreset: 'everyone',
+        lastMessage: {
+          text: 'First announcement text',
+          senderId: 'u1',
+          senderName: 'Naomi',
+          timestamp: 'SERVER_TS',
+        },
       });
 
       // 2. Genesis system message

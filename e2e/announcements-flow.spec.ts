@@ -38,10 +38,10 @@ test.describe('Announcements UI/UX Rework (#743)', () => {
     await announceTab.click();
 
     // 5. Step 1: Channel Name & Audience Preset
-    await page.getByPlaceholder(/e\.g\. campus news/i).fill(announcementTitle);
+    await page.getByLabel(/channel name/i).fill(announcementTitle);
 
     // Verify "Everyone in the app" preset is active by default (User Story 1, 2)
-    await expect(page.getByText(/everyone in the app/i)).toBeVisible();
+    await expect(page.getByText('Everyone in the app', { exact: true })).toBeVisible();
 
     // Click "Next" to go to Step 2
     const nextBtn = page.getByRole('button', { name: /^next$/i });
@@ -49,26 +49,26 @@ test.describe('Announcements UI/UX Rework (#743)', () => {
     await nextBtn.click();
 
     // 6. Step 2: Compose & Pin (User Stories 5, 11)
-    await expect(page.getByPlaceholder(/write an announcement…/i)).toBeVisible({ timeout: 5_000 });
-    await page.getByPlaceholder(/write an announcement…/i).fill(announcementBody);
+    await expect(page.getByPlaceholder(/write your announcement/i)).toBeVisible({ timeout: 5_000 });
+    await page.getByPlaceholder(/write your announcement/i).fill(announcementBody);
 
     // Pin the announcement
-    const pinCheckbox = page.getByRole('checkbox', { name: /pin this announcement/i });
-    await pinCheckbox.check();
+    const pinBtn = page.getByRole('button', { name: /^pin it$/i });
+    await pinBtn.click();
 
     // Click "Review" to go to Step 3 (User Stories 6, 8, 9)
     const reviewBtn = page.getByRole('button', { name: /^review$/i });
     await reviewBtn.click();
 
     // 7. Step 3: Review summary & Notification preview
-    await expect(page.getByText(/review announcement/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /^review$/i })).toBeVisible();
     await expect(page.getByText(announcementTitle).first()).toBeVisible();
     await expect(page.getByText(/pinned/i).first()).toBeVisible();
 
     // Test back button preserves data (User Story 9)
     const backBtn = page.getByRole('button', { name: /^back$/i });
     await backBtn.click();
-    await expect(page.getByPlaceholder(/write an announcement…/i)).toHaveValue(announcementBody);
+    await expect(page.getByPlaceholder(/write your announcement/i)).toHaveValue(announcementBody);
     await page.getByRole('button', { name: /^review$/i }).click();
 
     // 8. Send announcement
@@ -144,17 +144,17 @@ test.describe('Announcements UI/UX Rework (#743)', () => {
     await threadReplyBtn.click();
 
     // Thread pane opens
-    await expect(page.locator('.msgs-thread-pane')).toBeVisible({ timeout: 5_000 });
-    await expect(page.locator('.msgs-thread-pane')).toContainText('Thread');
+    await expect(page.locator('.msgs-pane')).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator('.msgs-pane')).toContainText('Thread');
 
     // Trainee posts a reply in thread
-    const threadComposer = page.locator('.msgs-thread-pane textarea');
+    const threadComposer = page.locator('.msgs-pane textarea');
     await expect(threadComposer).toBeVisible();
     await threadComposer.fill(traineeReply);
     await threadComposer.press('Meta+Enter');
 
     // Reply appears inside the thread pane
-    await expect(page.locator('.msgs-thread-pane').getByText(traineeReply)).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('.msgs-pane').getByText(traineeReply)).toBeVisible({ timeout: 10_000 });
 
     // Main stream post footer updates to show "1 reply"
     await expect(postCard.getByText('1 reply')).toBeVisible({ timeout: 10_000 });
@@ -179,8 +179,8 @@ test.describe('Announcements UI/UX Rework (#743)', () => {
     await expect(postCard.getByText('1 reply')).toBeVisible({ timeout: 5_000 });
     await postCard.getByText('1 reply').click();
 
-    await expect(page.locator('.msgs-thread-pane')).toBeVisible({ timeout: 5_000 });
-    await expect(page.locator('.msgs-thread-pane').getByText(traineeReply)).toBeVisible();
+    await expect(page.locator('.msgs-pane')).toBeVisible({ timeout: 5_000 });
+    await expect(page.locator('.msgs-pane').getByText(traineeReply)).toBeVisible();
 
     // 4. Open Read receipts modal (User Stories 12, 13, 14)
     const readReceiptBtn = postCard.locator('.readcount');

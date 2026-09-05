@@ -366,7 +366,7 @@ describe('CreateChatModal Component', () => {
 
     // Move to the announcement tab — step is 1, channel name input is shown.
     fireEvent.click(screen.getByRole('button', { name: /^Announcement$/i }));
-    expect(screen.getByPlaceholderText(/Weekly notes/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Channel name/i)).toBeInTheDocument();
 
     // And back to Message — still empty.
     fireEvent.click(screen.getByRole('button', { name: /^Message$/i }));
