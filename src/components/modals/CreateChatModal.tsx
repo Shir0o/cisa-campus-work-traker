@@ -339,10 +339,11 @@ export default function CreateChatModal({ isOpen, onClose, onSelectRoom }: Creat
                   {announceStep === 1 && (
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-xs font-semibold text-on-surface-variant mb-1.5">
+                        <label htmlFor="announce-name" className="block text-xs font-semibold text-on-surface-variant mb-1.5">
                           {t('modals.announcement_name_label')}
                         </label>
                         <input
+                          id="announce-name"
                           type="text"
                           required
                           placeholder={t('modals.announcement_placeholder')}

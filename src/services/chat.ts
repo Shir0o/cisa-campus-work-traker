@@ -128,6 +128,13 @@ export async function createAnnouncementRoom(
 ): Promise<string> {
   const allMembers = Array.from(new Set([currentUser.uid, ...memberUids]));
 
+  // The genesis/initial messages below post with raw addDoc, which — unlike
+  // sendMessage — never writes the room preview. Set lastMessage here so the
+  // rail shows the announcement instead of "No messages yet" (#836).
+  const genesisText = `${currentUser.displayName} started announcements for "${name}"`;
+  const hasPostText = !!initialPost?.text.trim();
+  const hasPostFiles = !!initialPost?.attachments?.length;
+
   const roomData: Record<string, any> = {
     type: 'announcement',
     name,
@@ -135,6 +142,16 @@ export async function createAnnouncementRoom(
     createdById: currentUser.uid,
     createdByName: currentUser.displayName,
     createdAt: serverTimestamp(),
+    lastMessage: {
+      text: hasPostText
+        ? initialPost!.text.trim()
+        : hasPostFiles
+          ? `Shared ${initialPost!.attachments![0].type}`
+          : genesisText,
+      senderId: currentUser.uid,
+      senderName: hasPostText || hasPostFiles ? currentUser.displayName : 'System',
+      timestamp: serverTimestamp(),
+    },
   };
 
   if (audiencePreset) {
@@ -148,7 +165,7 @@ export async function createAnnouncementRoom(
   // `senderId == request.auth.uid` and silently drops the write otherwise.
   await addDoc(collection(db, 'chatRooms', roomRef.id, 'messages'), {
     roomId: roomRef.id,
-    text: `${currentUser.displayName} started announcements for "${name}"`,
+    text: genesisText,
     senderId: currentUser.uid,
     senderName: 'System',
     timestamp: serverTimestamp(),
